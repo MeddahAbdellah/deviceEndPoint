@@ -1,4 +1,14 @@
 window.onload = function(){
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  const deviceName = urlParams.get('deviceName');
+  console.log(deviceName);
+  if(!deviceName){
+    document.querySelector('body').innerHTML = 'Device must have a name';
+    return;
+  }
+
   let rtcPeer = null;
 
   function initWebRtc(socket) { 

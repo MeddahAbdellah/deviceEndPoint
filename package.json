@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/MeddahAbdellah/deviceEndPoint#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "open": "^8.0.2"
   }
 }
