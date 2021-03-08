@@ -60,7 +60,7 @@ window.onload = function(){
       }
       rtcPeer =  new SimplePeer({
         initiator: false,
-        trinkle: false,
+        trinkle: true,
         stream,
         config
       });
