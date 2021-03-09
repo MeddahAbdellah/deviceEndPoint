@@ -51,7 +51,6 @@ window.onload = function(){
     signalingSocket.emit('connectToSession', { sessionId: data.sessionId });
     setUpRtcPeer();
     pingSignalInterval = setInterval(() => {
-      
       signalingSocket.emit("sendSignal",{
           sessionId: data.sessionId,
           type: "initCall", 
@@ -80,8 +79,10 @@ window.onload = function(){
             }
         ]
     }
-    rtcPeer.removeAllListeners('signal');
-    rtcPeer.removeAllListeners('error');
+    if (rtcPeer) {
+      rtcPeer.removeAllListeners('signal');
+      rtcPeer.removeAllListeners('error');
+    }
     rtcPeer =  new SimplePeer({
       initiator: false,
       trinkle: false,
