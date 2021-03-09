@@ -49,7 +49,9 @@ window.onload = function(){
 
   devicesSocket.on('sessionInit', (data) => {
     signalingSocket.emit('connectToSession', { sessionId: data.sessionId });
+    setUpRtcPeer();
     pingSignalInterval = setInterval(() => {
+      
       signalingSocket.emit("sendSignal",{
           sessionId: data.sessionId,
           type: "initCall", 
@@ -58,10 +60,8 @@ window.onload = function(){
     }, 1000);
   });
 
-
-  function handleRtcSignal(sessionId, socket, signalData, stream) { 
-    if( signalData.data.type === "offer") {
-      const config = {
+  function setUpRtcPeer() {
+    const config = {
         iceServers: [
             { "urls": "stun:stun.l.google.com:19302" },
             { "urls": "stun:stun2.l.google.com:19302" },
@@ -80,33 +80,31 @@ window.onload = function(){
             }
         ]
     }
-      rtcPeer =  new SimplePeer({
-        initiator: false,
-        trinkle: false,
-        stream,
-        config
-      });
-      rtcPeer.removeAllListeners('signal');
-      rtcPeer.removeAllListeners('error');
-  
-      rtcPeer.on('signal', (data) => {
-        console.log("sendSignal", data);
-          socket.emit("sendSignal",{
-            sessionId,
-            type: "rtcSignal", 
-            data,
-            sender: 'device',
-        }); 
-      });
-  
-      rtcPeer.on('error', (err) => {
-          console.log("err", err);
-      });
-      rtcPeer.signal(signalData.data);
-    } else {
-      if (rtcPeer) rtcPeer.signal(signalData.data);
-    }
+    rtcPeer.removeAllListeners('signal');
+    rtcPeer.removeAllListeners('error');
+    rtcPeer =  new SimplePeer({
+      initiator: false,
+      trinkle: false,
+      stream,
+      config
+    });
+    rtcPeer.on('signal', (data) => {
+      console.log("sendSignal", data);
+        socket.emit("sendSignal",{
+          sessionId,
+          type: "rtcSignal", 
+          data,
+          sender: 'device',
+      }); 
+    });
 
+    rtcPeer.on('error', (err) => {
+        console.log("err", err);
+    });
+  }
+
+  function handleRtcSignal(sessionId, socket, signalData, stream) { 
+    if (rtcPeer) rtcPeer.signal(signalData.data);
   }
 
   function handleCandidate(signalData) {
