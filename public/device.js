@@ -67,16 +67,16 @@ window.onload = function(){
             { "urls": "stun:stun2.l.google.com:19302" },
             { 
               urls: "stun:13.36.31.88:3478",
-              credential: 'lina',
-              username: 'benchabane',
+                credential: 'benchabane',
+                username: 'lina',
             },
             
             // public turn server from https://gist.github.com/sagivo/3a4b2f2c7ac6e1b5267c2f1f59ac6c6b
             // set your own servers here
             {
               urls: 'turn:13.36.31.88:3478',
-              credential: 'lina',
-              username: 'benchabane'
+              credential: 'benchabane',
+              username: 'lina'
             }
         ]
     }
