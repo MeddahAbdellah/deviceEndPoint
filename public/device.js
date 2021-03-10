@@ -10,6 +10,14 @@ window.onload = function(){
   }
 
   let rtcPeer = null;
+  const manager = new io.Manager("https://gr6.algonics.net");
+  const devicesSocket = manager.socket("/devices");
+  devicesSocket.connect();
+  devicesSocket.emit('addToConnectedDevices', { deviceName: 'test5'});
+ 
+  const signalingSocket = manager.socket(`/signaling`);
+  signalingSocket.connect();
+  initWebRtc(signalingSocket);
 
   function initWebRtc(socket) { 
     //********************** 
@@ -17,6 +25,19 @@ window.onload = function(){
     //********************** 
     navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => { 
       document.querySelector('video').srcObject = stream;
+
+      devicesSocket.on('sessionInit', (data) => {
+        socket.emit('connectToSession', { sessionId: data.sessionId });
+        setUpRtcPeer(stream, data.sessionId, socket);
+        pingSignalInterval = setInterval(() => {
+          socket.emit("sendSignal",{
+              sessionId: data.sessionId,
+              type: "initCall", 
+              sender: 'device',
+          }); 
+        }, 1000);
+      });
+
       socket.off();
       socket.on('listenSignal', (signalData) => {
         clearInterval(pingSignalInterval);
@@ -38,28 +59,9 @@ window.onload = function(){
     }); 
  };
 
-  const manager = new io.Manager("https://gr6.algonics.net");
-  const devicesSocket = manager.socket("/devices");
-  devicesSocket.connect();
-  devicesSocket.emit('addToConnectedDevices', { deviceName: 'test5'});
- 
-  const signalingSocket = manager.socket(`/signaling`);
-  signalingSocket.connect();
-  initWebRtc(signalingSocket);
 
-  devicesSocket.on('sessionInit', (data) => {
-    signalingSocket.emit('connectToSession', { sessionId: data.sessionId });
-    setUpRtcPeer();
-    pingSignalInterval = setInterval(() => {
-      signalingSocket.emit("sendSignal",{
-          sessionId: data.sessionId,
-          type: "initCall", 
-          sender: 'device',
-      }); 
-    }, 1000);
-  });
 
-  function setUpRtcPeer() {
+  function setUpRtcPeer(stream, sessionId, socket) {
     const config = {
         iceServers: [
             { "urls": "stun:stun.l.google.com:19302" },
