@@ -13,7 +13,7 @@ window.onload = function(){
   const manager = new io.Manager("https://gr6.algonics.net");
   const devicesSocket = manager.socket("/devices");
   devicesSocket.connect();
-  devicesSocket.emit('addToConnectedDevices', { deviceName: 'test5'});
+  devicesSocket.emit('addToConnectedDevices', { deviceName });
  
   const signalingSocket = manager.socket(`/signaling`);
   signalingSocket.connect();
