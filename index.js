@@ -83,4 +83,4 @@ const launchApp = async () => {
     });
 };
 
-app.listen(8080);
+app.listen(8080, launchApp);
