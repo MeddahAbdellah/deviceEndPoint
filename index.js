@@ -5,8 +5,31 @@ var open = require('open');
 const io = require('socket.io-client');
 const fs = require('fs');
 const sharedPath = "./shared/";
-const deviceName = process.argv[2];
+const prompts = require('prompts');
 
+app.use(express.static('public'));
+app.get('/', function(req, res) {
+    res.sendFile('/public/index.html');
+});
+const launchApp = async () => {
+  if (!fs.existsSync(sharedPath)){
+      fs.mkdirSync(sharedPath);
+  }
+  const response = await prompts({
+    type: 'text',
+    name: 'deviceName',
+    message: 'What is the name of your device?'
+  });
+  console.log('opening', response.deviceName)
+  setupSockets(response.deviceName)
+  await open(`http://localhost:8080?deviceName=${ response.deviceName || ''}`,  {
+      app: {
+          name: open.apps.chrome
+      }
+  });
+};
+
+const setupSockets = (deviceName) => {
 const manager = new io.Manager("https://gr6.algonics.net", { secure: true, reconnection: true, rejectUnauthorized: false });
 const devicesSocket = manager.socket('/fileDevices');
 devicesSocket.connect();
@@ -69,18 +92,6 @@ devicesSocket.on('sessionInit', (data) => {
   });
 
 });
-
-app.use(express.static('public'));
-app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname + '/index.html'));
-});
-const launchApp = async () => {
-    console.log('opening', deviceName)
-    await open(`http://localhost:8080?deviceName=${ deviceName || ''}`,  {
-        app: {
-            name: open.apps.chrome
-        }
-    });
-};
+}
 
 app.listen(8080, launchApp);

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "pkg": { "assets": ["/", "public/**/*", "shared/**/*"] },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,6 +20,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "open": "^8.0.2",
+    "prompts": "^2.4.0",
     "socket.io-client": "^3.1.2"
   }
 }
